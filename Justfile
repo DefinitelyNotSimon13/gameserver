@@ -1,5 +1,5 @@
 default:
     just --list
-
-run:
-    go run cmd/game_server/main.go
+ 
+run *ARGS:
+    go run cmd/gameserver/main.go {{ARGS}}
