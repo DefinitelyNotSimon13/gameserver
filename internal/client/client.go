@@ -1,20 +1,21 @@
 package client
 
 import (
+	"github.com/google/uuid"
 	"net"
 )
 
 type Client struct {
-	Id      uint32
-	UDPAddr *net.UDPAddr
-	// Pointer or not?
-	TCPConn *net.Conn
-	// Status?
+	ClientId         uuid.UUID
+	ConnectedSession *uuid.UUID
+	Username         string
+	UDPAddr          *net.UDPAddr
+	TCPConn          *net.Conn
 }
 
-func NewClient(id uint32, tcpConn *net.Conn) *Client {
+func NewClient(id uuid.UUID, tcpConn *net.Conn) *Client {
 	return &Client{
-		Id:      id,
-		TCPConn: tcpConn,
+		ClientId: id,
+		TCPConn:  tcpConn,
 	}
 }

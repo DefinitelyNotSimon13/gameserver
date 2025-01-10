@@ -2,7 +2,9 @@ package server
 
 import (
 	"fmt"
-	"github.com/DefinitelyNotSimon13/gameserver/internal/client"
+	"github.com/DefinitelyNotSimon13/gameserver/internal/packet"
+	"github.com/DefinitelyNotSimon13/gameserver/internal/session"
+	"github.com/google/uuid"
 	"log"
 	"net"
 	"sync"
@@ -13,8 +15,8 @@ type Server struct {
 	tcpListener net.Listener
 	udpConn     *net.UDPConn
 
-	clients map[uint32]*client.Client
-	mu      sync.Mutex
+	sessions map[uuid.UUID]*session.Session
+	mu       sync.Mutex
 
 	connectionId uint32
 }
@@ -22,8 +24,8 @@ type Server struct {
 // NewServer creates a Server with default maps, locks, etc.
 func NewServer(addr string) *Server {
 	return &Server{
-		addr:    addr,
-		clients: make(map[uint32]*client.Client),
+		addr:     addr,
+		sessions: make(map[uuid.UUID]*session.Session),
 	}
 }
 
@@ -72,11 +74,11 @@ func (s *Server) acceptTCPConnections() {
 		// We increment the connectionId here for each new connection
 
 		s.connectionId++
-		s.clients[s.connectionId] = client.NewClient(s.connectionId, &tcpConn)
+		// s.clients[s.connectionId] = client.NewClient(uuid.New(), &tcpConn)
 
 		// Handle each connection in its own goroutine
 		go s.handleTCPConnection(tcpConn, s.connectionId)
-		log.Printf("Currently %d clients connected.\n", len(s.clients))
+		// log.Printf("Currently %d clients connected.\n", len(s.clients))
 	}
 }
 
@@ -96,9 +98,13 @@ func (s *Server) handleUDPConnections() {
 			continue
 		}
 
-		version := buf[0] & 0x0F // Low nibble
+		version, err := packet.ParsePacketVersion(buf[0])
+		if err != nil {
+			log.Printf("Failed to parse packet version: %v\n", err)
+			continue
+		}
 		switch version {
-		case PacketVersion0:
+		case packet.VERSION_0:
 			s.handlePacketV0(buf, n, remoteAddr)
 		default:
 			log.Printf("Unknown version (%d) from %v\n", version, remoteAddr)
