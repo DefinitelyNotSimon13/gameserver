@@ -2,10 +2,10 @@ package server
 
 import (
 	"fmt"
+	"github.com/DefinitelyNotSimon13/gameserver/internal/client"
 	"log"
 	"net"
 	"sync"
-	"github.com/DefinitelyNotSimon13/raylib-c/server/internal/client"
 )
 
 type Server struct {
@@ -13,10 +13,8 @@ type Server struct {
 	tcpListener net.Listener
 	udpConn     *net.UDPConn
 
-	clients	map[uint32]*client.Client
-	mu         sync.Mutex
-
-
+	clients map[uint32]*client.Client
+	mu      sync.Mutex
 
 	connectionId uint32
 }
@@ -24,7 +22,7 @@ type Server struct {
 // NewServer creates a Server with default maps, locks, etc.
 func NewServer(addr string) *Server {
 	return &Server{
-		addr:       addr,
+		addr:    addr,
 		clients: make(map[uint32]*client.Client),
 	}
 }

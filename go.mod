@@ -1,4 +1,4 @@
-module github.com/DefinitelyNotSimon13/raylib-c/server
+module github.com/DefinitelyNotSimon13/gameserver
 
 go 1.23.4
 

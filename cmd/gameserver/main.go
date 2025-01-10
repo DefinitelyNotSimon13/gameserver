@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/DefinitelyNotSimon13/raylib-c/server/internal/server"
+	"github.com/DefinitelyNotSimon13/gameserver/internal/server"
 	"log"
 )
 
