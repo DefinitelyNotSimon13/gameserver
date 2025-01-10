@@ -1,13 +1,24 @@
-name: Docker
+name: Build and Push Dockerimage
 
 on: [push, pull_request]
 
+env:
+    GHCR: ghcr.io
+    DR: index.docker.io
+    IMAGE_NAME: ${{ github.repository }}
+
 jobs:
-    build_and_push:
+    dockerhub:
         runs-on: ubuntu-latest
+        permissions:
+            packages: write
+            contents: read
+            attestations: write
+            id-token: write
 
         steps:
-            - uses: actions/checkout@v4
+            - name: Checkout Repository
+              uses: actions/checkout@v4
 
             - name: Login to DockerHub
               uses: docker/login-action@v3
@@ -15,8 +26,69 @@ jobs:
                 username: ${{ vars.DOCKERHUB_USERNAME }}
                 password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-            - name: Build and push Docker image
-              uses: docker/build-push-action@v6.11.0
+            - name: Extract metadata (tags, labels) for Docker
+              id: meta
+              uses: docker/metadata-action@v5
               with:
+                images: ${{ env.IMAGE_NAME }}
+
+
+            - name: Build and push Docker image
+              id: push
+              uses: docker/build-push-action@v6
+              with:
+                context: .
                 push: true
-                tags: ${{ vars.DOCKERHUB_USERNAME }}/gameserver:latest
+                tags: ${{ steps.meta.outputs.tags }}
+                labels: ${{ steps.meta.outputs.labels }}
+
+            - name: Generate artifact attestation
+              uses: actions/attest-build-provenance@v2
+              with:
+                subject-name: ${{ env.DR }}/${{ env.IMAGE_NAME }}
+                subject-digest: ${{ steps.push.outputs.digest }}
+                push-to-registry: true
+
+    ghcr:
+        runs-on: ubuntu-latest
+        permissions:
+            packages: write
+            contents: read
+            attestations: write
+            id-token: write
+
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+
+
+            - name: Login to Github Container Registry
+              uses: docker/login-action@v3
+              with:
+                registry: ${{ env.GHCR }}
+                username: ${{ github.actor }}
+                password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Extract metadata (tags, labels) for Docker
+              id: meta
+              uses: docker/metadata-action@v5
+              with:
+                images: ${{ env.GHCR }}/${{ env.IMAGE_NAME }}
+
+
+            - name: Build and push Docker image
+              id: push
+              uses: docker/build-push-action@v6
+              with:
+                context: .
+                push: true
+                tags: ${{ steps.meta.outputs.tags }}
+                labels: ${{ steps.meta.outputs.labels }}
+
+            - name: Generate artifact attestation
+              uses: actions/attest-build-provenance@v2
+              with:
+                subject-name: ${{ env.GHCR }}/${{ env.IMAGE_NAME }}
+                subject-digest: ${{ steps.push.outputs.digest }}
+                push-to-registry: true
+
