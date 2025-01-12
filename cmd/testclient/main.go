@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	SGCPVersion = 0
+	SGCPVersion = 1
 )
 
 func main() {

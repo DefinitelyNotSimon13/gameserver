@@ -27,10 +27,12 @@ func (s *Server) handleTCPConnection(conn net.Conn, id uint32) {
 			continue
 		}
 
-		var responsePacket *packet.PacketV0
+		var responsePacket *packet.PacketV1
 		switch version {
 		case packet.VERSION_0:
-			responsePacket, err = processing.V0Packet(buf[:n])
+			log.Println("Received deprecated version 0 packet")
+		case packet.VERSION_1:
+			responsePacket, err = processing.V1Packet(buf[:n])
 		default:
 			log.Println("Can't process packet, unknown version")
 		}
@@ -42,7 +44,7 @@ func (s *Server) handleTCPConnection(conn net.Conn, id uint32) {
 		if responsePacket == nil {
 			log.Printf("Parsing of packet failed fatally, packet == nil.\n")
 			log.Printf("Generating error packet for response...\n")
-			responsePacket = packet.ErrorPacketV0()
+			responsePacket = packet.ErrorPacketV1()
 		}
 
 		response, err := responsePacket.ToBytes()

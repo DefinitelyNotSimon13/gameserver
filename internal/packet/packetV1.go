@@ -15,7 +15,7 @@ const (
 	ClientIdLen = 16
 )
 
-type PacketV0 struct {
+type PacketV1 struct {
 	Version    uint8     // Byte 0
 	Type       uint8     // Byte 1
 	ClientId   uuid.UUID // Byte 2 -17
@@ -25,7 +25,7 @@ type PacketV0 struct {
 	//TODO Checksum - needed? Not really via TCP right? Maybe for udp
 }
 
-func (p *PacketV0) ToBytes() ([]byte, error) {
+func (p *PacketV1) ToBytes() ([]byte, error) {
 	buf := &bytes.Buffer{}
 	buf.Grow(int(HeaderSize + p.PayloadLen))
 
@@ -72,8 +72,8 @@ func (p *PacketV0) ToBytes() ([]byte, error) {
 
 }
 
-func ErrorPacketV0() *PacketV0 {
-	return &PacketV0{
+func ErrorPacketV1() *PacketV1 {
+	return &PacketV1{
 		Version:    0,
 		Type:       255,
 		Flags:      *DefaultFlags(),
@@ -82,7 +82,7 @@ func ErrorPacketV0() *PacketV0 {
 	}
 }
 
-func ParsePacketV0(data []byte) (*PacketV0, error) {
+func ParsePacketV1(data []byte) (*PacketV1, error) {
 	log.Println("Parsing Packet...")
 	if len(data) < HeaderSize {
 		return nil, errors.New("packet to short")
@@ -112,7 +112,7 @@ func ParsePacketV0(data []byte) (*PacketV0, error) {
 	log.Printf("\tFlags: %v\n", flags)
 	log.Printf("\tPayloadLength: %d", payloadLen)
 
-	return &PacketV0{
+	return &PacketV1{
 		Version:    0,
 		Type:       packetType,
 		ClientId:   clientId,

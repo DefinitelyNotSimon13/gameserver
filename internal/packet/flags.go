@@ -27,7 +27,6 @@ func DefaultFlags() *Flags {
 // ParseFlags parses a byte into a Flags struct
 func parseFlags(flagsByte byte) Flags {
 	return Flags{
-		//! ENDIANESS !
 		Bit0: flagsByte&0x01 != 0, // Check if the least significant bit is set
 		Bit1: flagsByte&0x02 != 0, // Check if the second bit is set
 		Bit2: flagsByte&0x04 != 0, // Check if the third bit is set

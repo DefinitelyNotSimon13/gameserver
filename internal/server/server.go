@@ -105,7 +105,7 @@ func (s *Server) handleUDPConnections() {
 		}
 		switch version {
 		case packet.VERSION_0:
-			s.handlePacketV0(buf, n, remoteAddr)
+			s.handlePacketV1(buf, n, remoteAddr)
 		default:
 			log.Printf("Unknown version (%d) from %v\n", version, remoteAddr)
 		}

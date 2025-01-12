@@ -6,14 +6,14 @@ import (
 	"log"
 )
 
-func processPlayerInit(p *packet.PacketV0) (*packet.PacketV0, error) {
+func processPlayerInit(p *packet.PacketV1) (*packet.PacketV1, error) {
 	flags := packet.DefaultFlags()
 
 	userName := string(p.Payload)
 	log.Printf("Received UserName: %s\n", userName)
 
-	return &packet.PacketV0{
-		Version:    0,
+	return &packet.PacketV1{
+		Version:    1,
 		Type:       0,
 		ClientId:   uuid.New(),
 		Flags:      *flags,

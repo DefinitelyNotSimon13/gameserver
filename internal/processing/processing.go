@@ -6,9 +6,9 @@ import (
 	"log"
 )
 
-func V0Packet(buf []byte) (*packet.PacketV0, error) {
-	log.Printf("Processing V0 Packet with length %d\n", len(buf))
-	p, err := packet.ParsePacketV0(buf)
+func V1Packet(buf []byte) (*packet.PacketV1, error) {
+	log.Printf("Processing V1 Packet with length %d\n", len(buf))
+	p, err := packet.ParsePacketV1(buf)
 	if err != nil {
 		return nil, errors.Join(errors.New("Failed to process packet"), err)
 	}

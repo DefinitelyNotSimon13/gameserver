@@ -6,8 +6,8 @@ import (
 	"net"
 )
 
-// handlePacketV0 is a method for handling version-0 UDP packets.
-func (s *Server) handlePacketV0(data []byte, length int, remoteAddr *net.UDPAddr) {
+// handlePacketV1 is a method for handling version-0 UDP packets.
+func (s *Server) handlePacketV1(data []byte, length int, remoteAddr *net.UDPAddr) {
 	// Safe to assume we've already checked length >= 1
 	if length < 17 {
 		log.Println("Received too few bytes for PacketVersion0 (need >= 17)")
@@ -18,7 +18,7 @@ func (s *Server) handlePacketV0(data []byte, length int, remoteAddr *net.UDPAddr
 	x, y, z := packet.ParseCoordinates(data)
 
 	log.Printf(
-		"V0 packet from %v with Id %d => x=%.2f, y=%.2f, z=%.2f\n",
+		"V1 packet from %v with Id %d => x=%.2f, y=%.2f, z=%.2f\n",
 		remoteAddr, senderId, x, y, z,
 	)
 

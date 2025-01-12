@@ -24,6 +24,7 @@
 | 7   |                       |                 |       |
 | 8   |                       |                 |       |
 
+
 to client: if bit0 == 1 -> failure
 ### Types
 
