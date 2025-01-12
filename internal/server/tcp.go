@@ -2,7 +2,6 @@ package server
 
 import (
 	"github.com/DefinitelyNotSimon13/gameserver/internal/packet"
-	"github.com/DefinitelyNotSimon13/gameserver/internal/processing"
 	"log"
 	"net"
 )
@@ -32,7 +31,7 @@ func (s *Server) handleTCPConnection(conn net.Conn, id uint32) {
 		case packet.VERSION_0:
 			log.Println("Received deprecated version 0 packet")
 		case packet.VERSION_1:
-			responsePacket, err = processing.V1Packet(buf[:n])
+			responsePacket, err = s.processV1Packet(buf[:n], &conn)
 		default:
 			log.Println("Can't process packet, unknown version")
 		}
@@ -56,16 +55,4 @@ func (s *Server) handleTCPConnection(conn net.Conn, id uint32) {
 			log.Printf("Failed to send response: %v\n", err)
 		}
 	}
-
-	// bs := make([]byte, 4)
-	// binary.LittleEndian.PutUint32(bs, id)
-	//
-	// log.Printf("Assigned TCP Id %d -> Writing bytes: %v\n", id, bs)
-	// if _, err := conn.Write(bs); err != nil {
-	// 	log.Printf("Error sending TCP message: %v\n", err)
-	// 	return
-	// }
-	//
-	// log.Printf("Sent greeting to %v\n", conn.RemoteAddr())
-	// Here you could read from conn, handle protocol negotiation, etc.
 }

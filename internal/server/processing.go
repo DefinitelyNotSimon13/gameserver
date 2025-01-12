@@ -1,12 +1,13 @@
-package processing
+package server
 
 import (
 	"errors"
 	"github.com/DefinitelyNotSimon13/gameserver/internal/packet"
 	"log"
+	"net"
 )
 
-func V1Packet(buf []byte) (*packet.PacketV1, error) {
+func (s *Server) processV1Packet(buf []byte, tcpConn *net.Conn) (*packet.PacketV1, error) {
 	log.Printf("Processing V1 Packet with length %d\n", len(buf))
 	p, err := packet.ParsePacketV1(buf)
 	if err != nil {
@@ -17,10 +18,11 @@ func V1Packet(buf []byte) (*packet.PacketV1, error) {
 	switch p.Type {
 	case packet.PLAYER_INIT:
 		log.Println("Type is: PlayerInit Packet")
-		return processPlayerInit(p)
+		return s.processPlayerInit(p, tcpConn)
 
 	case packet.SESSION_INIT:
 		log.Println("Type is: SessionInit Packet")
+		return s.processSessionInit(p)
 
 	case packet.PLAYER_POSITION:
 		log.Println("Type is: PlayerPosition Packet")

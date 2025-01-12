@@ -3,29 +3,37 @@ package session
 import (
 	"github.com/DefinitelyNotSimon13/gameserver/internal/client"
 	"github.com/google/uuid"
+	"math/rand"
 	"sync"
+	"time"
 )
 
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+const length = 6
+
 type Session struct {
-	SessionId   uuid.UUID
+	Token       string
 	Connections map[uuid.UUID]*client.Client
 	mu          sync.Mutex
 }
 
-func NewSession() (*Session, error) {
-	id := uuid.New()
+func NewSession() *Session {
+	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[seededRand.Intn(len(charset))]
+	}
 
 	return &Session{
-		SessionId:   id,
-		Connections: make(map[uuid.UUID]*client.Client, 0),
-	}, nil
+		Token:       string(b),
+		Connections: make(map[uuid.UUID]*client.Client),
+	}
 }
 
 func (s *Session) AddClient(c *client.Client) {
-	c.ConnectedSession = &s.SessionId
+	c.ConnectedSession = &s.Token
 
 	s.Connections[c.ClientId] = c
-
 }
 
 func (s *Session) RemoveClient(c *client.Client) {
@@ -36,8 +44,8 @@ func (s *Session) RemoveClient(c *client.Client) {
 }
 
 func (s *Session) InvalidateSession() {
-	for _, client := range s.Connections {
-		client.ConnectedSession = nil
+	for _, c := range s.Connections {
+		c.ConnectedSession = nil
 	}
 	s.Connections = nil
 }

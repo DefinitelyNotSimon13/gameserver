@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"github.com/DefinitelyNotSimon13/gameserver/internal/client"
 	"github.com/DefinitelyNotSimon13/gameserver/internal/packet"
 	"github.com/DefinitelyNotSimon13/gameserver/internal/session"
 	"github.com/google/uuid"
@@ -15,7 +16,8 @@ type Server struct {
 	tcpListener net.Listener
 	udpConn     *net.UDPConn
 
-	sessions map[uuid.UUID]*session.Session
+	clients  map[uuid.UUID]*client.Client
+	sessions map[string]*session.Session
 	mu       sync.Mutex
 
 	connectionId uint32
@@ -25,7 +27,8 @@ type Server struct {
 func NewServer(addr string) *Server {
 	return &Server{
 		addr:     addr,
-		sessions: make(map[uuid.UUID]*session.Session),
+		clients:  make(map[uuid.UUID]*client.Client),
+		sessions: make(map[string]*session.Session),
 	}
 }
 

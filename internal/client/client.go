@@ -7,15 +7,15 @@ import (
 
 type Client struct {
 	ClientId         uuid.UUID
-	ConnectedSession *uuid.UUID
+	ConnectedSession *string
 	Username         string
 	UDPAddr          *net.UDPAddr
 	TCPConn          *net.Conn
 }
 
-func NewClient(id uuid.UUID, tcpConn *net.Conn) *Client {
+func NewClient(username string, tcpConn *net.Conn) *Client {
 	return &Client{
-		ClientId: id,
+		ClientId: uuid.New(),
 		TCPConn:  tcpConn,
 	}
 }
